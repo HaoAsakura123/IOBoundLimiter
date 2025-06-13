@@ -1,0 +1,209 @@
+basePath: /
+definitions:
+  handlers.RefreshRequest:
+    properties:
+      refresh:
+        description: |-
+          Refresh токен для обновления пары
+          @Example eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMTIzIn0.ABC123...
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        type: string
+    required:
+    - refresh
+    type: object
+  handlers.Task:
+    description: Модель задачи для создания
+    properties:
+      taskname:
+        description: |-
+          Название задачи
+          @Example "Провести код-ревью"
+        example: Какая то длинная io bound
+        type: string
+    required:
+    - taskname
+    type: object
+  handlers.TaskID:
+    description: Идентификатор задачи в формате UUID
+    properties:
+      uuid:
+        description: |-
+          Уникальный идентификатор задачи
+          @Example 6ba7b810-9dad-11d1-80b4-00c04fd430c8
+        example: 6ba7b810-9dad-11d1-80b4-00c04fd430c8
+        type: string
+    required:
+    - uuid
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@tasksapi.com
+    name: API Support
+  description: API для управления задачами с авторизацией и воркерами
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  title: Tasks API
+  version: "1.0"
+paths:
+  /api/add:
+    post:
+      consumes:
+      - application/json
+      description: Добавляет новую задачу в систему обработки
+      parameters:
+      - description: Данные задачи
+        in: body
+        name: task
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.Task'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"status":"access","uuid":"string"}'
+          schema:
+            type: object
+        "400":
+          description: '{"error":"should contain task"}'
+          schema:
+            type: object
+        "500":
+          description: '{"error":"server is busy"}'
+          schema:
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Добавить задачу
+      tags:
+      - tasks
+  /api/delete:
+    delete:
+      consumes:
+      - application/json
+      description: Удаляет задачу по UUID
+      parameters:
+      - description: UUID задачи
+        in: body
+        name: uuid
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.TaskID'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: "{\"status\":\"access\",\"deleted\ttask\":\"string\"}"
+          schema:
+            type: object
+        "400":
+          description: '{"error":"string"}'
+          schema:
+            type: object
+        "404":
+          description: "{\"status\":\"Not\tfound\tcurrent\ttask\"}"
+          schema:
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Удалить задачу
+      tags:
+      - tasks
+  /api/refresh:
+    post:
+      consumes:
+      - application/json
+      description: Обновляет пару access и refresh токенов
+      parameters:
+      - description: Refresh токен
+        in: body
+        name: refresh
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.RefreshRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"status":"string"}'
+          schema:
+            type: object
+        "400":
+          description: '{"error":"string"}'
+          schema:
+            type: object
+        "401":
+          description: "{\"error\":\"invalid\tauthorization\tformat\"}"
+          schema:
+            type: object
+        "500":
+          description: '{"error":"string"}'
+          schema:
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Обновить токены
+      tags:
+      - auth
+  /register:
+    get:
+      consumes:
+      - application/json
+      description: Создает нового пользователя и возвращает пару токенов
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"status":"string"}'
+          schema:
+            type: object
+        "500":
+          description: '{"error":"string"}'
+          schema:
+            type: object
+      summary: Зарегистрировать пользователя
+      tags:
+      - auth
+  /status:
+    post:
+      consumes:
+      - application/json
+      description: Возвращает текущий статус задачи
+      parameters:
+      - description: UUID задачи
+        in: body
+        name: uuid
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.TaskID'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"status":"access", "task name": "string", "createdAt": date,
+            "current status": "string", "working time": "diff time" }'
+          schema:
+            type: object
+        "204":
+          description: '{"status":"not found task"}'
+          schema:
+            type: object
+        "400":
+          description: '{"error":"Bad request: should contain UUID"}'
+          schema:
+            type: object
+        "404":
+          description: "{\"error\":\"Not\tfound\tcurrent\ttask\"}"
+          schema:
+            type: object
+      summary: Получить статус задачи
+      tags:
+      - tasks
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
