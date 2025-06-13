@@ -1,28 +1,27 @@
 # IOBoundLimiter
-Service for limiting I/O bound tasks
+**Service for limiting I/O bound tasks**
 
 # INFO
-В swagger документации описаны руты, с примерами запросов
+> В swagger документации описаны руты, с примерами запросов
 
-Используется JWT аутентификация, формат: "Bearer <token_access>"
+> Используется JWT аутентификация, формат: "Bearer <token_access>"
 
 # Сборка в контейнере
-- Сборка + запуск
-    docker-compose up --build
+## Сборка + запуск
+- docker-compose up --build
 
-- Только запуск (после сборки)
-    docker-compose up
+## Только запуск (после сборки)
+- docker-compose up
 
-# Сборка без контейнера
-Нужно находится в корневой директории (папке ioboundlimiter)
-- Запуск
-    go run cmd/main.go
+## Сборка без контейнера
+> Нужно находится в корневой директории (папке ioboundlimiter)
+- go run cmd/main.go
 
 # Присутствуют тесты (немножко:)
 
-- Запуск
-    1. go test -v ./internal/storage
-    2. go test -v -cover ./internal/storage
+## Запуск
+1. go test -v ./internal/storage
+2. go test -v -cover ./internal/storage
 
 # Общая концепция
 
